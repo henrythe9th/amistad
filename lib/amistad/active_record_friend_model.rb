@@ -70,7 +70,7 @@ module Amistad
 
     def add_friend(user, platform)
       return false if user == self || find_any_friendship_with(user)
-      Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = platform; f.accepted = true; f.friend_registered = user.is_registered? }.save
+      Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = platform; f.pending = false; f.friend_registered = user.is_registered? }.save
     end
 
     # approve a friendship invitation. If the operation succeeds, the method returns true, else false
