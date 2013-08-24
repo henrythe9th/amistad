@@ -182,5 +182,10 @@ module Amistad
       end
       friendship
     end
+
+    #updates the registered status to true for the user in the friendships table
+    def self.update_friend_registered_status_for(user)
+      Amistad.friendship_class.where(friend_id: user.id).update_all(friend_registered: true)
+    end
   end
 end
