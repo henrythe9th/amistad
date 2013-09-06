@@ -64,13 +64,13 @@ module Amistad
     end
 
     #add facebook friend
-    def add_fb_friend(user)
-      add_friend(user, "facebook")
+    def add_fb_friend(user, mutual_friends_count=0)
+      add_friend(user, "facebook", mutual_friends_count)
     end
 
-    def add_friend(user, platform)
+    def add_friend(user, platform, mutual_friends_count=0)
       return false if user == self || find_any_friendship_with(user)
-      Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = platform; f.pending = false; f.friend_registered = user.is_registered? }.save
+      Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = platform; f.mutual_friends_count = mutual_friends_count; f.pending = false; f.friend_registered = user.is_registered? }.save
     end
 
     # approve a friendship invitation. If the operation succeeds, the method returns true, else false
