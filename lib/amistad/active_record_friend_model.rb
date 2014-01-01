@@ -60,7 +60,7 @@ module Amistad
     # suggest a user to become a friend. If the operation succeeds, the method returns true, else false
     def invite(user)
       return false if user == self || find_any_friendship_with(user)
-      Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user }.save
+      Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = 'facebook' ; f.pending = true; f.friend_registered = user.is_registered? }.save
     end
 
     #add facebook friend
