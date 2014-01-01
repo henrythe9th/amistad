@@ -91,8 +91,8 @@ module Amistad
     # returns the list of approved friends
     def friends
       self.class.where{
-        ( id.in(invited.select{friend_id})              ) |
-        ( id.in(invited_by.select{friendable_id})  )
+        ( id.in(self.invited.select{friend_id})              ) |
+        ( id.in(self.invited_by.select{friendable_id})  )
       }
     end
 
@@ -118,8 +118,8 @@ module Amistad
     # returns the list of blocked friends
     def blocked_friends
       self.class.where{
-        ( id.in(blockades.select{friend_id})        ) |
-        ( id.in(blockades_by.select{friendable_id}) )
+        ( id.in(self.blockades.select{friend_id})        ) |
+        ( id.in(self.blockades_by.select{friendable_id}) )
       }
     end
 
