@@ -90,9 +90,12 @@ module Amistad
 
     # returns the list of approved friends
     def friends
+      invited_ids = self.invited.pluck(:friend_id)
+      invited_by_ids = self.invited_by.pluck(:friendable_id)
+
       self.class.where{
-        ( id.in(self.invited.select{friend_id})              ) |
-        ( id.in(self.invited_by.select{friendable_id})  )
+        ( id.in(invited_ids)    ) |
+        ( id.in(invited_by_ids) )
       }
     end
 
@@ -117,9 +120,12 @@ module Amistad
 
     # returns the list of blocked friends
     def blocked_friends
+      blockade_ids = self.blockades.pluck(:friend_id)
+      blockade_by_ids = self.blockades_by.pluck(:friendable_id)
+
       self.class.where{
-        ( id.in(self.blockades.select{friend_id})        ) |
-        ( id.in(self.blockades_by.select{friendable_id}) )
+        ( id.in(blockade_ids)    ) |
+        ( id.in(blockade_by_ids) )
       }
     end
 
