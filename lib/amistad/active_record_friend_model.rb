@@ -90,23 +90,9 @@ module Amistad
 
     # returns the list of approved friends
     def friends
-      friendship_model = Amistad::Friendships.const_get(:"#{Amistad.friendship_model}")
-
-      approved_friendships = friendship_model.where{
-        ( friendable_id == my{id} ) &
-        ( pending       == false  ) &
-        ( blocker_id    == nil    )
-      }
-
-      approved_inverse_friendships = friendship_model.where{
-        ( friend_id  == my{id} ) &
-        ( pending    == false   ) &
-        ( blocker_id == nil     )
-      }
-
       self.class.where{
-        ( id.in(approved_friendships.select{friend_id})              ) |
-        ( id.in(approved_inverse_friendships.select{friendable_id})  )
+        ( id.in(invited.select{friend_id})              ) |
+        ( id.in(invited_by.select{friendable_id})  )
       }
     end
 
@@ -131,8 +117,10 @@ module Amistad
 
     # returns the list of blocked friends
     def blocked_friends
-      self.reload
-      self.blockades + self.blockades_by
+      self.class.where{
+        ( id.in(blockades.select{friend_id})        ) |
+        ( id.in(blockades_by.select{friendable_id}) )
+      }
     end
 
     # total # of blockades and blockedes_by without association loading
