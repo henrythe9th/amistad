@@ -116,32 +116,32 @@ module Amistad
     end
 
     # blocks a friendship
-    def block(user)
+    def block_friend(user)
       friendship = find_any_friendship_with(user)
       return false if friendship.nil? || !friendship.can_block?(self)
       friendship.update_attribute(:blocker, self)
     end
 
     # unblocks a friendship
-    def unblock(user)
+    def unblock_friend(user)
       friendship = find_any_friendship_with(user)
       return false if friendship.nil? || !friendship.can_unblock?(self)
       friendship.update_attribute(:blocker, nil)
     end
 
     # returns the list of blocked friends
-    def blocked
+    def blocked_friends
       self.reload
       self.blockades + self.blockades_by
     end
 
     # total # of blockades and blockedes_by without association loading
-    def total_blocked
+    def total_blocked_friends
       self.blockades(false).count + self.blockades_by(false).count
     end
 
     # checks if a user is blocked
-    def blocked?(user)
+    def blocked_friend?(user)
       blocked.include?(user)
     end
 
