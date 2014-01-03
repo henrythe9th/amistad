@@ -114,6 +114,7 @@ module Amistad
       friendship = find_any_friendship_with(user)
       return false if friendship.nil? || !friendship.can_block?(self)
       friendship.update_attribute(:blocker, self)
+      return friendship
     end
 
     # unblocks a friendship
@@ -121,6 +122,7 @@ module Amistad
       friendship = find_any_friendship_with(user)
       return false if friendship.nil? || !friendship.can_unblock?(self)
       friendship.update_attribute(:blocker, nil)
+      return friendship
     end
 
     # returns the list of blocked friends
