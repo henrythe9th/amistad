@@ -57,10 +57,12 @@ module Amistad
         :conditions => "friendable_id <> blocker_id"
     end
 
-    # suggest a user to become a friend. If the operation succeeds, the method returns true, else false
+    # suggest a user to become a friend. If the operation succeeds, the method returns frienship class, else false
     def invite(user)
       return false if user == self || find_any_friendship_with(user)
-      Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = 'facebook' ; f.pending = true; f.friend_registered = user.is_registered? }.save
+      friendship = Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = 'facebook' ; f.pending = true; f.friend_registered = user.is_registered? }
+      friendship.save
+      return friendship
     end
 
     #add facebook friend
@@ -70,14 +72,17 @@ module Amistad
 
     def add_friend(user, platform, mutual_friends_count=0)
       return false if user == self || find_any_friendship_with(user)
-      Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = platform; f.mutual_friends_count = mutual_friends_count; f.pending = false; f.friend_registered = user.is_registered? }.save
+      friendship = Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = platform; f.mutual_friends_count = mutual_friends_count; f.pending = false; f.friend_registered = user.is_registered? }
+      frienship.save
+      return friendship
     end
 
-    # approve a friendship invitation. If the operation succeeds, the method returns true, else false
+    # approve a friendship invitation. If the operation succeeds, the method returns friendship class, else false
     def approve(user)
       friendship = find_any_friendship_with(user)
       return false if friendship.nil? || invited?(user)
       friendship.update_attribute(:pending, false)
+      return friendship
     end
 
     # deletes a friendship
