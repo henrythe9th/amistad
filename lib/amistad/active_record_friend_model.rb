@@ -5,6 +5,7 @@ module Amistad
     extend ActiveSupport::Concern
 
     included do
+      MAX_INVITES_COUNT = 10
       #####################################################################################
       # friendships
       #####################################################################################
@@ -57,11 +58,13 @@ module Amistad
         :conditions => "friendable_id <> blocker_id"
     end
 
-    # suggest a user to become a friend. If the operation succeeds, the method returns frienship class, else false
+    # suggest a user to become a friend. Returns frienship class
     def invite(user)
-      return false if user == self || find_any_friendship_with(user)
-      friendship = Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = 'facebook' ; f.pending = true; f.friend_registered = user.is_registered? }
-      friendship.save
+      return false if user == self || find_any_friendship_with(user) || self.friend_invite_count > MAX_INVITES_COUNT
+      friendship = Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = 'umentioned' ; f.pending = true; f.friend_registered = user.is_registered? }
+      if friendship.save
+        self.increment_counter(:friend_invite_count)
+      end
       return friendship
     end
 
@@ -73,7 +76,10 @@ module Amistad
     def add_friend(user, platform, mutual_friends_count=0)
       return false if user == self || find_any_friendship_with(user)
       friendship = Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = platform; f.mutual_friends_count = mutual_friends_count; f.pending = false; f.friend_registered = user.is_registered? }
-      frienship.save
+      if frienship.save
+        self.increment_counter(:friend_count)
+        user.increment_counter(:friend_count)
+      end
       return friendship
     end
 
@@ -81,7 +87,11 @@ module Amistad
     def approve(user)
       friendship = find_any_friendship_with(user)
       return false if friendship.nil? || invited?(user)
-      friendship.update_attribute(:pending, false)
+      if friendship.update_attribute(:pending, false)
+        self.increment_counter(:friend_count)
+        user.increment_counter(:friend_count)
+        user.decrement_counter(:friend_invite_count)
+      end
       return friendship
     end
 
@@ -89,7 +99,10 @@ module Amistad
     def remove_friendship(user)
       friendship = find_any_friendship_with(user)
       return false if friendship.nil?
-      friendship.destroy
+      if friendship.destroy
+        self.decrement_counter(:friend_count)
+        user.decrement_counter(:friend_count)
+      end
       self.reload && user.reload if friendship.destroyed?
     end
 
