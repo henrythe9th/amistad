@@ -91,6 +91,9 @@ module Amistad
         self.increment_counter(:friend_count)
         user.increment_counter(:friend_count)
         user.decrement_counter(:friend_invite_count)
+
+        #update mutual friend count
+        friendship.update_attribute(:mutual_friends_count, self.common_friends_with(user).count)
       end
       return friendship
     end
