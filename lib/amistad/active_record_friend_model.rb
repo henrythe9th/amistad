@@ -58,7 +58,7 @@ module Amistad
         :conditions => "friendable_id <> blocker_id"
     end
 
-    # suggest a user to become a friend. Returns frienship class
+    # suggest a user to become a friend. Returns friendship class
     def invite(user)
       return false if user == self || find_any_friendship_with(user) || self.friend_invite_count > MAX_INVITES_COUNT
       friendship = Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = 'umentioned' ; f.pending = true; f.friend_registered = user.is_registered? }
@@ -76,7 +76,7 @@ module Amistad
     def add_friend(user, platform, mutual_friends_count=0)
       return false if user == self || find_any_friendship_with(user)
       friendship = Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = platform; f.mutual_friends_count = mutual_friends_count; f.pending = false; f.friend_registered = user.is_registered? }
-      if frienship.save
+      if friendship.save
         self.class.increment_counter(:friend_count, self.id)
         user.class.increment_counter(:friend_count, user.id)
       end
