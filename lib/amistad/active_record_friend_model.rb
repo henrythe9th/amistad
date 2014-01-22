@@ -63,7 +63,7 @@ module Amistad
       return false if user == self || find_any_friendship_with(user) || self.friend_invite_count > MAX_INVITES_COUNT
       friendship = Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = 'umentioned' ; f.pending = true; f.friend_registered = user.is_registered? }
       if friendship.save
-        self.increment_counter(:friend_invite_count, 1)
+        self.class.increment_counter(:friend_invite_count, self.id)
       end
       return friendship
     end
@@ -77,8 +77,8 @@ module Amistad
       return false if user == self || find_any_friendship_with(user)
       friendship = Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user ; f.platform = platform; f.mutual_friends_count = mutual_friends_count; f.pending = false; f.friend_registered = user.is_registered? }
       if frienship.save
-        self.increment_counter(:friend_count, 1)
-        user.increment_counter(:friend_count, 1)
+        self.class.increment_counter(:friend_count, self.id)
+        user.class.increment_counter(:friend_count, user.id)
       end
       return friendship
     end
@@ -88,9 +88,9 @@ module Amistad
       friendship = find_any_friendship_with(user)
       return false if friendship.nil? || invited?(user)
       if friendship.update_attribute(:pending, false)
-        self.increment_counter(:friend_count, 1)
-        user.increment_counter(:friend_count, 1)
-        user.decrement_counter(:friend_invite_count, 1)
+        self.class.increment_counter(:friend_count, self.id)
+        user.class.increment_counter(:friend_count, user.id)
+        user.class.decrement_counter(:friend_invite_count, user.id)
 
         #update mutual friend count
         friendship.update_attribute(:mutual_friends_count, self.common_friends_with(user).count)
