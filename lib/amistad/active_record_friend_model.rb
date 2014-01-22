@@ -103,8 +103,8 @@ module Amistad
       friendship = find_any_friendship_with(user)
       return false if friendship.nil?
       if friendship.destroy
-        self.decrement_counter(:friend_count, 1)
-        user.decrement_counter(:friend_count, 1)
+        self.class.decrement_counter(:friend_count, self.id)
+        user.class.decrement_counter(:friend_count, user.id)
       end
       self.reload && user.reload if friendship.destroyed?
     end
