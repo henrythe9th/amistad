@@ -5,7 +5,7 @@ module Amistad
     extend ActiveSupport::Concern
 
     included do
-      MAX_INVITES_COUNT = 10
+      MAX_INVITES_COUNT = 50
       #####################################################################################
       # friendships
       #####################################################################################
